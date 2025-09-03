@@ -4,145 +4,194 @@ import { Link } from "react-router-dom";
 function UserTable({ users }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+
   const usersPerPage = 10;
- 
-  const filteredUsers = users.filter((user) => {
-    const term = searchTerm.toLowerCase();
-    return (
-      user.first_name.toLowerCase().includes(term) ||
-      user.last_name.toLowerCase().includes(term)
-    );
-  });
 
+  const sortedUsers = React.useMemo(() => {
+    let sortableUsers = [...users];
+    if (sortConfig.key !== null) {
+      sortableUsers.sort((a, b) => {
+        const aValue = a[sortConfig.key];
+        const bValue = b[sortConfig.key];
+        if (typeof aValue === "string" && typeof bValue === "string") {
+          return sortConfig.direction === "asc"
+            ? aValue.localeCompare(bValue)
+            : bValue.localeCompare(aValue);
+        } else {
+          return sortConfig.direction === "asc"
+            ? aValue - bValue
+            : bValue - aValue;
+        }
+      });
+    }
+    return sortableUsers;
+  }, [users, sortConfig]);
 
-  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+  const filteredUsers = sortedUsers.filter(
+    (user) =>
+      user.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.last_name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
 
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
     }
+    setSortConfig({ key, direction });
+  };
+
+  const getSortArrow = (key) => {
+    if (sortConfig.key !== key) return "⇅";
+    return sortConfig.direction === "asc" ? "↑" : "↓";
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Users</h1>
-      <div style={{ marginBottom: "20px" }}>
-        <input
-          type="text"
-          placeholder="Search by first or last name"
-          value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-            setCurrentPage(1); 
-          }}
-          style={{
-            padding: "8px",
-            width: "250px",
-            borderRadius: "5px",
-            border: "1px solid #ccc",
-          }}
-        />
-      </div>
+    <div>
+      <h2>Users</h2>
+      <input
+        type="text"
+        placeholder="Search by first or last name"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        style={{
+          marginBottom: "10px",
+          padding: "5px",
+          width: "250px",
+          border: "1px solid #ccc",
+          borderRadius: "4px",
+        }}
+      />
 
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          marginTop: "10px",
+        }}
+      >
         <thead>
           <tr style={{ background: "#f5f5f5" }}>
-            <th style={thStyle}>First Name</th>
-            <th style={thStyle}>Last Name</th>
-            <th style={thStyle}>Age</th>
-            <th style={thStyle}>Email</th>
-            <th style={thStyle}>Website</th>
+            <th
+              onClick={() => requestSort("first_name")}
+              style={{ cursor: "pointer", padding: "10px", border: "1px solid #ddd" }}
+            >
+              First Name {getSortArrow("first_name")}
+            </th>
+            <th
+              onClick={() => requestSort("last_name")}
+              style={{ cursor: "pointer", padding: "10px", border: "1px solid #ddd" }}
+            >
+              Last Name {getSortArrow("last_name")}
+            </th>
+            <th
+              onClick={() => requestSort("age")}
+              style={{ cursor: "pointer", padding: "10px", border: "1px solid #ddd" }}
+            >
+              Age {getSortArrow("age")}
+            </th>
+            <th
+              onClick={() => requestSort("email")}
+              style={{ cursor: "pointer", padding: "10px", border: "1px solid #ddd" }}
+            >
+              Email {getSortArrow("email")}
+            </th>
+            <th
+              onClick={() => requestSort("web")}
+              style={{ cursor: "pointer", padding: "10px", border: "1px solid #ddd" }}
+            >
+              Website {getSortArrow("web")}
+            </th>
           </tr>
         </thead>
         <tbody>
           {currentUsers.map((user) => (
             <tr key={user.id}>
-              <td style={{ ...tdStyle, color: "black" }}>
+              <td style={{ padding: "8px", border: "1px solid #ddd" }}>
                 <Link
                   to={`/users/${user.id}`}
-                  style={{ textDecoration: "none", color: "blue" }}
+                  style={{ textDecoration: "none", color: "black" }}
                 >
                   {user.first_name}
                 </Link>
               </td>
-              <td style={tdStyle}>{user.last_name}</td>
-              <td style={tdStyle}>{user.age}</td>
-              <td style={tdStyle}>{user.email}</td>
-              <td style={tdStyle}>
+              <td style={{ padding: "8px", border: "1px solid #ddd" }}>
+                {user.last_name}
+              </td>
+              <td style={{ padding: "8px", border: "1px solid #ddd" }}>
+                {user.age}
+              </td>
+              <td style={{ padding: "8px", border: "1px solid #ddd" }}>
+                {user.email}
+              </td>
+              <td style={{ padding: "8px", border: "1px solid #ddd" }}>
                 <a href={user.web} target="_blank" rel="noopener noreferrer">
                   {user.web}
                 </a>
               </td>
             </tr>
           ))}
-
-          {currentUsers.length === 0 && (
-            <tr>
-              <td colSpan="5" style={{ padding: "10px", textAlign: "center" }}>
-                No users found.
-              </td>
-            </tr>
-          )}
         </tbody>
       </table>
 
-<div style={{ marginTop: "20px", textAlign: "center" }}>
-  <button
-    onClick={() => handlePageChange(currentPage - 1)}
-    disabled={currentPage === 1}
-    style={pageButtonStyle}
-  >           
-    &lt;
-  </button>
+      <div style={{ marginTop: "20px", textAlign: "center" }}>
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          style={{
+            padding: "5px 10px",
+            margin: "0 5px",
+            border: "1px solid #ccc",
+            background: "#fff",
+            cursor: currentPage === 1 ? "not-allowed" : "pointer",
+          }}
+        >
+          &lt;
+        </button>
 
-  {[...Array(Math.min(5, totalPages))].map((_, index) => (
-    <button
-      key={index + 1}
-      onClick={() => handlePageChange(index + 1)}
-      style={{
-        ...pageButtonStyle,
-        fontWeight: currentPage === index + 1 ? "bold" : "normal",
-        background: currentPage === index + 1 ? "#e0e0e0" : "white",
-      }}
-    >
-      {index + 1}
-    </button>
-  ))}
+        {[...Array(Math.min(5, totalPages))].map((_, index) => (
+          <button
+            key={index + 1}
+            onClick={() => handlePageChange(index + 1)}
+            style={{
+              padding: "5px 10px",
+              margin: "0 5px",
+              border: "1px solid #ccc",
+              background: currentPage === index + 1 ? "#eee" : "#fff",
+              fontWeight: currentPage === index + 1 ? "bold" : "normal",
+              cursor: "pointer",
+            }}
+          >
+            {index + 1}
+          </button>
+        ))}
 
-  <button
-    onClick={() => handlePageChange(currentPage + 1)}
-    disabled={currentPage === totalPages}
-    style={pageButtonStyle}
-  >
-    &gt;
-  </button>
-</div>
-
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          style={{
+            padding: "5px 10px",
+            margin: "0 5px",
+            border: "1px solid #ccc",
+            background: "#fff",
+            cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+          }}
+        >
+          &gt;
+        </button>
+      </div>
     </div>
   );
 }
-
-
-const thStyle = {
-  border: "1px solid #ddd",
-  padding: "10px",
-  textAlign: "left",
-};
-
-const tdStyle = {
-  border: "1px solid #ddd",
-  padding: "10px",
-};
-
-const pageButtonStyle = {
-  margin: "0 5px",
-  padding: "5px 10px",
-  border: "1px solid #ccc",
-  borderRadius: "3px",
-  cursor: "pointer",
-};
 
 export default UserTable;

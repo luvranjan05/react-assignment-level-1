@@ -15,15 +15,29 @@ function UserDetail({ users }) {
   }
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>
-        {user.first_name} {user.last_name}
+    <div
+      style={{
+        maxWidth: "500px",
+        margin: "30px auto",
+        padding: "20px",
+        border: "1px solid #ddd",
+        borderRadius: "8px",
+        boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      <h2 style={{ marginBottom: "20px" }}>
+        Details: {user.first_name} {user.last_name}
       </h2>
+
       <p>
-        <strong>Email:</strong> {user.email}
+        <strong>First Name:</strong> {user.first_name}
       </p>
       <p>
-        <strong>Age:</strong> {user.age}
+        <strong>Last Name:</strong> {user.last_name}
+      </p>
+      <p>
+        <strong>Company_name:</strong> {user.company_name}
       </p>
       <p>
         <strong>City:</strong> {user.city}
@@ -32,16 +46,30 @@ function UserDetail({ users }) {
         <strong>State:</strong> {user.state}
       </p>
       <p>
-        <strong>Company:</strong> {user.company_name}
+        <strong>Zip:</strong> {user.zip}
       </p>
       <p>
-        <strong>Website:</strong>{" "}
+        <strong>Email:</strong> {user.email}
+      </p>
+      <p>
+        <strong>Web:</strong>{" "}
         <a href={user.web} target="_blank" rel="noopener noreferrer">
           {user.web}
         </a>
       </p>
+      <p>
+        <strong>Age:</strong> {user.age}
+      </p>
 
-      <Link to="/users" style={{ display: "inline-block", marginTop: "10px" }}>
+      <Link
+        to="/users"
+        style={{
+          display: "inline-block",
+          marginTop: "15px",
+          textDecoration: "none",
+          color: "#007bff",
+        }}
+      >
         ← Back to Users
       </Link>
     </div>
