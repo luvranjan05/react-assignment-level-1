@@ -1,12 +1,24 @@
 # React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# React Users Table
 
-Currently, two official plugins are available:
+This is a small React project where I display users in a table.  
+The data is coming from a JSON file and I added some basic functionality on top of it.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### What it can do
+- search by first name or last name  
+- sort columns (first name, last name, age, website, email)  
+- pagination with previous / next buttons  
+- click a user’s name to see a detail page  
 
-## Expanding the ESLint configuration
+### Tech used
+React with hooks, React Router for navigation, simple fetch for data, and I separated sorting logic into a `utils` folder to keep it clean.  
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Run locally
+Clone this repo, install dependencies, and start:
+
+```bash
+git clone ...........................................
+cd .............................
+npm install
+npm start
